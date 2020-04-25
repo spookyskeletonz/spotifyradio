@@ -25,6 +25,6 @@ public class ChatController {
       return;
     }
     logger.info("Received message for channel {}: {}", channelId, chatMessage.getMessage());
-    messagingTemplate.convertAndSend(String.format("/channel/%s", channelId), chatMessage);
+    messagingTemplate.convertAndSend(String.format("/channel/%s/chat", channelId), chatMessage);
   }
 }

@@ -1,7 +1,7 @@
 'use strict';
 
 var nameInput = $('#name');
-var roomInput = $('#room-id');
+var channelInput = $('#channel-id');
 var usernamePage = document.querySelector('#username-page');
 var chatPage = document.querySelector('#chat-page');
 var usernameForm = document.querySelector('#usernameForm');
@@ -9,12 +9,12 @@ var messageForm = document.querySelector('#messageForm');
 var messageInput = document.querySelector('#message');
 var messageArea = document.querySelector('#messageArea');
 var connectingElement = document.querySelector('.connecting');
-var roomIdDisplay = document.querySelector('#room-id-display');
+var channelIdDisplay = document.querySelector('#channel-id-display');
 
 var stompClient = null;
-var currentSubscription;
+var currentChatSubscription;
 var username = null;
-var roomId = null;
+var channelId = null;
 var topic = null;
 
 var colors = [
@@ -37,21 +37,21 @@ function connect(event) {
   event.preventDefault();
 }
 
-// Leave the current room and enter a new one.
-function enterRoom(newRoomId) {
-  roomId = newRoomId;
-  Cookies.set('roomId', roomId);
-  roomIdDisplay.textContent = roomId;
-  topic = `/app/chat/${newRoomId}`;
+// Leave the current channel and enter a new one.
+function enterChannel(newChannelId) {
+  channelId = newChannelId;
+  Cookies.set('channelId', channelId);
+  channelIdDisplay.textContent = channelId;
+  topic = `/app/chat/${newChannelId}`;
 
-  if (currentSubscription) {
-    currentSubscription.unsubscribe();
+  if (currentChatSubscription) {
+    currentChatSubscription.unsubscribe();
   }
-  currentSubscription = stompClient.subscribe(`/channel/${roomId}`, onMessageReceived);
+  currentChatSubscription = stompClient.subscribe(`/channel/${channelId}/chat`, onMessageReceived);
 }
 
 function onConnected() {
-  enterRoom(roomInput.val());
+  enterChannel(channelInput.val());
   connectingElement.classList.add('hidden');
 }
 
@@ -63,8 +63,8 @@ function onError(error) {
 function sendMessage(event) {
   var messageContent = messageInput.value.trim();
   if (messageContent.startsWith('/join ')) {
-    var newRoomId = messageContent.substring('/join '.length);
-    enterRoom(newRoomId);
+    var newChannelId = messageContent.substring('/join '.length);
+    enterChannel(newChannelId);
     while (messageArea.firstChild) {
       messageArea.removeChild(messageArea.firstChild);
     }
@@ -123,9 +123,9 @@ $(document).ready(function() {
     nameInput.val(savedName);
   }
 
-  var savedRoom = Cookies.get('roomId');
-  if (savedRoom) {
-    roomInput.val(savedRoom);
+  var savedChannel = Cookies.get('channelId');
+  if (savedChannel) {
+    channelInput.val(savedChannel);
   }
 
   usernamePage.classList.remove('hidden');
