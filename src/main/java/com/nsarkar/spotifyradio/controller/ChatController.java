@@ -15,7 +15,7 @@ public class ChatController {
   Logger logger = LoggerFactory.getLogger(ChatController.class);
 
   @Autowired
-  SimpMessagingTemplate messagingTemplate;
+  private SimpMessagingTemplate messagingTemplate;
 
   @MessageMapping("/chat/{channelId}/sendMessage")
   public void sendMessage(@DestinationVariable String channelId, @Payload ChatMessage chatMessage) {
